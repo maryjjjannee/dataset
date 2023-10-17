@@ -1,0 +1,98 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+form {
+    width: 90%;
+    margin: 0 auto;
+    padding: 10px;
+    border: 1px solid #b0c4de;
+    background: white;
+    border-radius: 10px;
+    position: relative;
+    padding-top: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+.input-group {
+    margin: 10px 0px 10px 0px;
+
+}
+
+.input-group input {
+    height: 30px;
+    width: 93%;
+    padding: 5px 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid gray;
+}
+
+.input-group label {
+    display: block;
+    text-align: left;
+    margin: 3px;
+}
+
+
+.input-group span {
+    margin-right: 10px;
+}
+
+.input-group span {
+    display: flex;
+    align-items: center;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+
+.input-group input[type="text"] {
+    width: 80%;
+    font-size: 14px;
+    line-height: 1.2;
+}
+.input-group-btn{
+    display: flex;
+    justify-content: center; /* จัดให้เนื้อหาอยู่ตรงกลางแนวนอน */
+    align-items: center; /* จัดให้เนื้อหาอยู่ตรงกลางแนวดิ่ง */
+}
+
+
+/* CSS สำหรับขนาดของกรอบ description */
+.input-group label[for="description"] {
+    width: 100px;
+    /* กำหนดความกว้างของ label ของ description */
+}
+.status-button {
+    display: inline-block;
+    padding: 20px 20px; /* ปรับขนาดของปุ่ม */
+    font-size: 16px;
+    margin-right: 10px;
+    margin-left: 50px;
+    width: 200px; /* กำหนดความกว้างของปุ่ม */
+
+}
+.btn-form {
+    padding: 10px;
+    font-size: 15px;
+    margin-right: 20px;
+    color: white;
+    background: #5f9ea0;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+
+
+
