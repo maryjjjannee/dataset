@@ -1,71 +1,111 @@
 <?php
 session_start();
-include('server.php');
-
-// ตั้งค่าการใช้ภาษา utf8
+include('server.php'); // Include your database connection code
 mysqli_set_charset($conn, "utf8");
+// Check database connection
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+if (isset($_SESSION['id']) && isset($_SESSION['username'])) {
+    $user_id = $_SESSION['id']; // รับค่า 'id' จากเซสชัน
+    $username = $_SESSION['username']; // รับค่า 'username' จากเซสชัน
 
+    // ทำสิ่งที่คุณต้องการกับ 'id' และ 'username' ในหน้านี้
+} 
+// Define the dataset ID
 $id = $_GET["id"];
 
-$sql = "SELECT dataset.id, dataset.dataname, dataset.class, dataset.description, dataset.status
-FROM dataset
-WHERE dataset.id = $id";
+// Fetch dataset and class information
+$sql = "SELECT dataset.id AS dataset_id, status, dataset.dataname, dataset.description, COUNT(class.id_class) AS class_count
+        FROM dataset
+        LEFT JOIN class ON dataset.id = class.dataset_id
+        WHERE dataset.id = $id
+        GROUP BY dataset.id, dataset.dataname, dataset.description";
 $result = mysqli_query($conn, $sql);
 
+// Check if the dataset exists
 if ($result) {
     $row = mysqli_fetch_assoc($result);
 
     if ($row) {
         $dataname = $row["dataname"];
         $description = $row["description"];
-        $class = $row["class"];
+        $class = $row["class_count"];
         $status = $row["status"];
 
         // Fetch class-specific data grouped by category
-        $classSql = "SELECT category, GROUP_CONCAT(image) AS images, COUNT(*) AS imageCount FROM class WHERE dataset_id = $id GROUP BY category";
+        $classSql = "SELECT class.category, COUNT(images.id_image) AS imageCount
+                    FROM class
+                    INNER JOIN images ON class.id_class = images.imageRef
+                    WHERE class.dataset_id = $id
+                    GROUP BY class.category";
         $classResult = mysqli_query($conn, $classSql);
+
         if (!$classResult) {
-            echo "เกิดข้อผิดพลาดในการดึงข้อมูลคลาส: " . mysqli_error($conn);
+            echo "Error fetching class data: " . mysqli_error($conn);
         }
     } else {
-        echo "ไม่พบข้อมูลสำหรับ ID ที่ระบุ";
+        echo "No data found for the specified ID.";
     }
 } else {
-    echo "เกิดข้อผิดพลาดในการดึงข้อมูลชุดข้อมูล: " . mysqli_error($conn);
+    echo "Error fetching dataset information: " . mysqli_error($conn);
 }
 ?>
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
-
-    <title>แก้ไขข้อมูล</title>
+    <link rel="icon"
+        href="https://static.vecteezy.com/system/resources/previews/009/665/134/original/seo-research-concept-with-a-magnifying-glass-researching-seo-from-a-website-inside-a-computer-vector-computer-website-showing-an-image-icon-and-a-magnifying-glass-searching-for-seo-keywords-concept-free-png.png">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
+    </script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <title>Edit Data</title>
 </head>
 
 <body>
+    <?php include('navbar.php'); ?>
     <div class="container my-3">
-        <h2 class="text-left">แก้ไขข้อมูล</h2>
+        <h3 class="text-center">📑 Edit Data <?php echo $dataname; ?> 📑</h3>
         <hr>
-        <form action="updateform.php" method="POST">
-            <input type="hidden" value="<?php echo $row["id"]; ?>" name="id">
-            <table class="table mb-0">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col" style="width:20%" class="table-warning">รายละเอียด</th>
+                    <td> <?php echo $description; ?></td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="col" class="table-warning">จำนวนคลาส</th>
+                    <td> <?php echo $class; ?></td>
+                </tr>
+                <tr>
+                    <th scope="col" class="table-warning">สถานะ</th>
+                    <td> <?php echo $status; ?></td>
+                </tr>
+            </tbody>
+        </table>
+        <form action="updateform.php" method="POST" enctype="multipart/form-data" id="classForm">
+            <h3 class="text-left">ข้อมูลคลาสทั้งหมด <button type="button" class="btn btn-warning" data-bs-toggle="modal"
+                    data-bs-target="#formInsertClass">➕
+                    คลาส</button></h3>
+            <table class="table table-success table-striped mt-3" style="border:white;" id="addClass">
                 <thead>
                     <tr>
                         <th>คลาส</th>
                         <th>หมวดหมู่</th>
-                        <th>ไฟล์</th>
-                        <th></th>
+                        <th>จำนวนไฟล์รูปภาพ</th>
+              
                     </tr>
                 </thead>
                 <tbody>
-
                     <?php
                     $i = 1; // Initialize class number
                     while ($classRow = mysqli_fetch_assoc($classResult)) {
@@ -74,73 +114,71 @@ if ($result) {
 
                         echo '<tr>';
                         echo '<td>' . $i . '</td>';
-                        echo '<td><input type="text" name="category[]" value="' . $category . '"></td>'; // Include an input field for category
-                        echo '<td><input type="file" name="image[]" accept=".jpg, .jpeg, .png, .gif ' . $imageCount . '" multiple></td>';
-                        echo '<td><button type="button" class="btn btn-danger" onclick="removeClassRow(this)">ลบ</button></td>';
-                         $query = "SELECT COUNT(*) AS image_count FROM images WHERE dataset_id = $id AND class = $i";
-                                                $result = mysqli_query($conn, $query);
-                                                if ($result) {
-                                                    $row = mysqli_fetch_assoc($result);
-                                                    $imageCount = $row['image_count'];
-                                                } else {
-                                                    $imageCount = 0;
-                                                }
-                                                echo '<td>' . $imageCount . ' images</td>'; 
-                                                echo '</tr>';
+                        echo '<td> <input class="form-control" type="text" name="category[]" value="' . $category . '"></td>
+                        <input type="hidden" name="dataset_id" value="' . $id . '">';
+                        echo '<td>' . $imageCount . ' files</td>';
+                        echo '<input type="hidden" name="dataset_id" value="' . $id . '">';
+                
                         echo '</tr>';
-                        $i++; // Increment class number
+                        $i++;
                     }
                     ?>
-
                 </tbody>
+
             </table>
-            <div class="my-3">
-                <a href="class.php" class="btn btn-primary">ย้อนกลับ</a>
-                <input type="submit" name="submit" value="บันทึกข้อมูล" class="btn btn-success">
-                <input type="reset" value="ล้างข้อมูล" class="btn btn-danger">
-                <button type="button" class="btn btn-secondary" onclick="addClassRow()">เพิ่มคลาส</button>
+            <div class="my-3 float-end">
+                <a href="class.php" class="btn btn-primary">👈🏼 กลับ</a>
+                <input type="submit" name="submit" id="updateButton" value="📂 บันทึกข้อมูล" class="btn btn-success">
+                <input type="reset" value="🗑️ ลบข้อมูล" class="btn btn-danger">
+                <!-- <button type="button" class="btn btn-light" onclick="addClassRow()">➕ คลาส</button> -->
+
             </div>
         </form>
     </div>
-    <script>
-        function addClassRow() {
-            const table = document.querySelector("table tbody");
-            const rows = table.querySelectorAll("tr");
-            const lastRow = rows[rows.length - 1];
-
-            if (lastRow) {
-                const lastClassNumber = parseInt(lastRow.querySelector("td:first-child").innerText);
-                const newClassNumber = lastClassNumber + 1;
-                const newRow = document.createElement("tr");
-                newRow.innerHTML = `
-            <td>${newClassNumber}</td>
-            <td><input type="text" name="category[]"></td>
-            <td><input type="file" name="image[]" accept=".jpg, .jpeg, .png, .gif" multiple></td>
-            <td><button type="button" class="btn btn-danger" onclick="removeClassRow(this)">ลบ</button></td>
-        `;
-                table.appendChild(newRow);
-            } else {
-                // If no rows exist, add the first row
-                const newRow = document.createElement("tr");
-                newRow.innerHTML = `
-            <td>1</td>
-            <td><input type="text" name="category[]"></td>
-            <td><input type="file" name="image[]" accept=".jpg, .jpeg, .png, .gif" multiple></td>
-            <td><button type="button" class="btn btn-danger" onclick="removeClassRow(this)">ลบ</button></td>
-        `;
-                table.appendChild(newRow);
-            }
-        }
-
-
-        function removeClassRow(button) {
-            const row = button.parentNode.parentNode;
-            row.parentNode.removeChild(row);
-        }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ"
-        crossorigin="anonymous"></script>
 </body>
 
+
+<div class="modal fade" id="formInsertClass" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">📌 Add Class</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addClassForm" method="POST" action="insertModal.php" enctype="multipart/form-data">
+                    <div class="form-floating mb-3">
+                        <!-- Input for class name -->
+                        <input type="text" name="category" class="form-control" id="category" placeholder="Please enter category" required>
+                        <label for="floatingInput">Class</label>
+                    </div>
+                    <div class="mb-3">
+                        <!-- Input for multiple images -->
+                        <label for="formFile" class="form-label">Upload Images</label>
+                        <input class="form-control" type="file" name="images[]" accept=".jpg, .jpeg, .png, .gif" multiple>
+                    </div>
+                    <!-- Hidden input for the dataset ID (from the original page) -->
+                    <input type="hidden" name="dataset_id" value="<?php echo $id; ?>">
+                    <input type="hidden" name="username" value="<?php echo $user; ?>">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="JavaScript/function.js">
+    // Add a submit event listener to the form
+document.getElementById('addClassForm').addEventListener('submit', submitFormData);
+</script>
 </html>
+
+<script>
+
+// Call this function when you want to update the data
+document.getElementById('updateButton').addEventListener('click', function() {
+    updateData();
+});
+
+</script>

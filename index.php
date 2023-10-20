@@ -19,6 +19,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon"
+        href="https://static.vecteezy.com/system/resources/previews/009/665/134/original/seo-research-concept-with-a-magnifying-glass-researching-seo-from-a-website-inside-a-computer-vector-computer-website-showing-an-image-icon-and-a-magnifying-glass-searching-for-seo-keywords-concept-free-png.png">
     <title>Home Page</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -26,15 +28,11 @@
 </head>
 
 <body>
-    <div class="homeheader">
-        <h2>ระบบจัดเก็บชุดข้อมูล</h2>
-
-    </div>
     
     <?php  include('navbar.php');?>
 
     <div class="homecontent">
-
+    <h2 class="text-center">ระบบจัดเก็บชุดข้อมูล</h2>
         <!-- notification message-->
         <?php if (isset($_SESSION['success'])): ?>
         <div class="success">
@@ -49,8 +47,8 @@
 
         <!-- logged user information-->
         <?php if (isset($_SESSION['username'])): ?>
-        <p>Welcome <strong><?php echo $_SESSION['username']; ?></strong></p>
-        <p><a href="login.php?logout = '1'" style="color: red;">Logout</a></p>
+        <p class="text-center">Welcome <strong><?php echo $_SESSION['username']; ?></strong></p>
+        <a href="login.php?logout = '1'" style="color: red;"><button class="btn btn-danger">Logout</button></a>
         <?php endif ?>
     </div>
 

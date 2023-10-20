@@ -1,22 +1,16 @@
 <?php
 session_start();
 include('server.php');
+include('navbar.php'); 
 
 
-// if (isset($_SESSION['id_users'])) {
-//     $user_id = $_SESSION['id_users'];
-//     echo "User ID: " . $user_id;
-// } else {
-//     echo "User is not logged in.";
-// }
 
 mysqli_set_charset($conn, "utf8");
 
 $id = $_GET["id"];
-
-$sql = "SELECT dataset.id, dataset.dataname, dataset.class, dataset.description, dataset.status
-FROM dataset
-WHERE dataset.id = $id";
+$sql = "SELECT dataset.id AS dataset_id,status, dataset.dataname, dataset.description, COUNT(class.id_class) AS class_count, dataset.    implementdate 
+        FROM dataset LEFT JOIN class ON dataset.id = class.dataset_id
+        WHERE dataset.id = $id GROUP BY dataset.id, dataset.dataname, dataset.description";
 $result = mysqli_query($conn, $sql);
 
 if ($result) {
@@ -25,11 +19,17 @@ if ($result) {
     if ($row) {
         $dataname = $row["dataname"];
         $description = $row["description"];
-        $class = $row["class"];
+        $class = $row["class_count"];
         $status = $row["status"];
+        $implementdate = $row["implementdate"];
 
         // Fetch class-specific data grouped by category
-        $classSql = "SELECT category, GROUP_CONCAT(image) AS images, COUNT(*) AS imageCount FROM class WHERE dataset_id = $id GROUP BY category";
+        $classSql = "SELECT class.category, COUNT(images.id_image) AS imageCount
+                     FROM class
+                     INNER JOIN images ON class.id_class = images.imageRef
+                     WHERE class.dataset_id = $id
+                     GROUP BY class.category;
+    ";
         $classResult = mysqli_query($conn, $classSql);
         if (!$classResult) {
             echo "เกิดข้อผิดพลาดในการดึงข้อมูลคลาส: " . mysqli_error($conn);
@@ -48,6 +48,8 @@ if ($result) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon"
+        href="https://static.vecteezy.com/system/resources/previews/009/665/134/original/seo-research-concept-with-a-magnifying-glass-researching-seo-from-a-website-inside-a-computer-vector-computer-website-showing-an-image-icon-and-a-magnifying-glass-searching-for-seo-keywords-concept-free-png.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
     <title>showdata</title>
@@ -86,6 +88,12 @@ if ($result) {
                                 <?php echo $status; ?>
                             </td>
                         </tr>
+                        <tr>
+                            <th>วันที่ :</th>
+                            <td>
+                                <?php echo $implementdate; ?>
+                            </td>
+                        </tr>
                     </thead>
 
                     <table class="table">
@@ -101,21 +109,22 @@ if ($result) {
                             $i = 1; // Initialize class number
                             while ($classRow = mysqli_fetch_assoc($classResult)) {
                                 $category = $classRow["category"];
+                                // $images = $classRow["images"];
                                 $imageCount = $classRow["imageCount"];
 
                                 echo '<tr>';
                                 echo '<td>' . $i . '</td>';
                                 echo '<td>' . $category . '</td>';
                                 echo '<td>' . $imageCount . ' ไฟล์</td>';
-
-                                echo '</td>';
+                                
+                                echo '</tr>';
                                 $i++; // Increment class number
                             }
                             ?>
                         </tbody>
                     </table>
 
-                    <a href="class.php" class="btn btn-primary">ย้อนกลับ</a>
+                    <a href="class.php" class="btn btn-primary">👈🏼 กลับ</a>
             </div>
             </thead>
 
