@@ -53,7 +53,7 @@ if (isset($_POST['submit'])) {
         // Redirect after processing all classes
         echo "<script>
             alert('Image and category data have been successfully saved.');
-            window.location.href = 'class.php'; 
+            window.location.href = 'user.php'; 
         </script>";
     } else {
         echo "Error connecting to the database.<br>";

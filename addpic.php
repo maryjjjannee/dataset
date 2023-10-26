@@ -65,7 +65,7 @@ if ($result) {
     </head>
 
     <body>
-        <?php include('navbar.php'); ?>
+        <?php include('user_navbar.php'); ?>
         <div class="container">
             <h1 class="text-center mt-5"></h1>
             <form method="post" action="class_db.php" enctype="multipart/form-data">
@@ -115,7 +115,7 @@ if ($result) {
                                         </tbody>
                                     </table>
                                     <div class="my-3">
-                                    <a href="class.php" class="btn btn-primary">👈🏼 กลับ</a>
+                                    <a href="user.php" class="btn btn-primary">👈🏼 กลับ</a>
                                         <button type="submit" name="submit" class="btn btn-success">📂
                                             บันทึกข้อมูล</button>
                                         <input type="reset" value="🗑️ ลบข้อมูล" class="btn btn-danger">

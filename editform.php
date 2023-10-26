@@ -34,11 +34,11 @@ if ($result) {
         $status = $row["status"];
 
         // Fetch class-specific data grouped by category
-        $classSql = "SELECT class.category, COUNT(images.id_image) AS imageCount
+        $classSql = "SELECT id_class,class.category, COUNT(images.id_image) AS imageCount
                     FROM class
                     INNER JOIN images ON class.id_class = images.imageRef
                     WHERE class.dataset_id = $id
-                    GROUP BY class.category";
+                    GROUP BY class.category,id_class";
         $classResult = mysqli_query($conn, $classSql);
 
         if (!$classResult) {
@@ -70,7 +70,7 @@ if ($result) {
 </head>
 
 <body>
-    <?php include('navbar.php'); ?>
+    <?php include('user_navbar.php'); ?>
     <div class="container my-3">
         <h3 class="text-center">📑 Edit Data <?php echo $dataname; ?> 📑</h3>
         <hr>
@@ -93,47 +93,48 @@ if ($result) {
             </tbody>
         </table>
         <form action="updateform.php" method="POST" enctype="multipart/form-data" id="classForm">
-            <h3 class="text-left">ข้อมูลคลาสทั้งหมด <button type="button" class="btn btn-warning" data-bs-toggle="modal"
-                    data-bs-target="#formInsertClass">➕
-                    คลาส</button></h3>
-            <table class="table table-success table-striped mt-3" style="border:white;" id="addClass">
-                <thead>
-                    <tr>
-                        <th>คลาส</th>
-                        <th>หมวดหมู่</th>
-                        <th>จำนวนไฟล์รูปภาพ</th>
-              
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $i = 1; // Initialize class number
-                    while ($classRow = mysqli_fetch_assoc($classResult)) {
-                        $category = $classRow["category"];
-                        $imageCount = $classRow["imageCount"];
+    <h3 class="text-left">ข้อมูลคลาสทั้งหมด 
+        <button type="button" class="btn btn-warning" data-bs-toggle="modal"data-bs-target="#formInsertClass">➕คลาส</button></h3>
+    <table class="table table-success table-striped mt-3" style="border:white;" id="addClass">
+        <thead>
+            <tr>
+                <th>คลาส</th>
+                <th>หมวดหมู่</th>
+                <th>จำนวนไฟล์รูปภาพ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+                $i = 1; // Initialize class number
+                while ($classRow = mysqli_fetch_assoc($classResult)) {
+                    $categoryId = $classRow["id_class"];
+                    $category = $classRow["category"];
+                    $imageCount = $classRow["imageCount"];
+            
+            ?>
+            <tr>
+                <td><?php echo $i; ?></td>
+                <td>
+                    <input class="form-control" type="text" name="category[<?php echo $categoryId; ?>]" value="<?php echo $category; ?>">
+                    <input type="hidden" name="category_id[]" value="<?php echo $categoryId; ?>">
+                    <input type="hidden" name="dataset_id" value="<?php echo $id; ?>">
+                </td>
+                <td><?php echo $imageCount; ?> files</td>
+            </tr>
+            <?php
+                $i++;
+            }
+            ?>
+        </tbody>
 
-                        echo '<tr>';
-                        echo '<td>' . $i . '</td>';
-                        echo '<td> <input class="form-control" type="text" name="category[]" value="' . $category . '"></td>
-                        <input type="hidden" name="dataset_id" value="' . $id . '">';
-                        echo '<td>' . $imageCount . ' files</td>';
-                        echo '<input type="hidden" name="dataset_id" value="' . $id . '">';
-                
-                        echo '</tr>';
-                        $i++;
-                    }
-                    ?>
-                </tbody>
+    </table>
+    <div class="my-3 float-end">
+        <a href="class.php" class="btn btn-primary">👈🏼 กลับ</a>
+        <input type="submit" name="submit" id="updateButton" value="📂 บันทึกข้อมูล" class="btn btn-success">
+        <input type="reset" value="🗑️ ลบข้อมูล" class="btn btn-danger disabled">
+        </div>
+</form>
 
-            </table>
-            <div class="my-3 float-end">
-                <a href="class.php" class="btn btn-primary">👈🏼 กลับ</a>
-                <input type="submit" name="submit" id="updateButton" value="📂 บันทึกข้อมูล" class="btn btn-success">
-                <input type="reset" value="🗑️ ลบข้อมูล" class="btn btn-danger">
-                <!-- <button type="button" class="btn btn-light" onclick="addClassRow()">➕ คลาส</button> -->
-
-            </div>
-        </form>
     </div>
 </body>
 
@@ -168,17 +169,34 @@ if ($result) {
     </div>
 </div>
 
-<script src="JavaScript/function.js">
-    // Add a submit event listener to the form
-document.getElementById('addClassForm').addEventListener('submit', submitFormData);
-</script>
+<script src="JavaScript/function.js"></script>
 </html>
-
 <script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("updateButton").addEventListener("click", function(event) {
+        event.preventDefault(); // หยุดการส่งแบบปกติของฟอร์ม
 
-// Call this function when you want to update the data
-document.getElementById('updateButton').addEventListener('click', function() {
-    updateData();
+        // รับข้อมูลจากฟอร์ม
+        var formData = new FormData(document.getElementById("classForm"));
+
+        // ส่งข้อมูลไปยังไฟล์ PHP สำหรับอัพเดท
+        fetch("updateform.php", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json()) // สามารถแก้ไขตามความต้องการ
+        .then(data => {
+               console.log(data)
+            if (data.success) {
+             
+                alert("บันทึกข้อมูลเรียบร้อยแล้ว");
+                // ทำสิ่งที่คุณต้องการหลังจากบันทึกเช่น รีโหลดหรือรายการอื่น ๆ
+            } else {
+                alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+            }
+        });
+    });
 });
-
 </script>
+
+

@@ -22,7 +22,7 @@
 </head>
 
 <body>
-    <?php  include('navbar.php');?>
+    <?php  include('user_navbar.php');?>
 
     <div class="datasetshead mt-5">
         <br>
@@ -33,7 +33,7 @@
         <a href="dataform.php" class="btn" >
         <button type="button" class="btn btn-dark">➕ New dataset</button>
         </a>
-        <a href="class.php" class="btn" >
+        <a href="user.php" class="btn" >
         <button type="button" class="btn btn-outline-dark">your dataset</button>
         </a>
     </div>

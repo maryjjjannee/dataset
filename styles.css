@@ -102,3 +102,23 @@ form {
     /* สีพื้นหลังของ navbar */
     overflow: hidden;
 }
+.divImgCover{
+    height: 8rem;
+    overflow: hidden;
+    position: relative;
+    display: grid;
+    align-content: center;
+}
+.divImgCover>img{
+    transition: all 2s;
+    cursor: pointer;
+}
+.divImgCover>img:hover{
+    scale: 1.25;
+
+}
+
+.cardText{
+    height: 100px;
+    overflow: auto;
+}

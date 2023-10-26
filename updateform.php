@@ -1,35 +1,41 @@
 <?php
 session_start();
-include('server.php'); 
-// Include your database connection code
+include('server.php'); // Include your database connection code
 mysqli_set_charset($conn, "utf8");
 
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $dataset_id = $_POST["dataset_id"];
+    $category_data = $_POST["category"];
+    $category_id_data = $_POST["category_id"];
+    $return = [];
+    // เริ่มกระบวนการอัพเดท
+    $success = true;
 
+    // วนลูปผ่านข้อมูลหมวดหมู่และ category_id
+    for ($i = 0; $i < count($category_id_data); $i++) {
+        $category_id = $category_id_data[$i];
+        array_push($return, $category_id);
+        $category = mysqli_real_escape_string($conn, $category_data[$category_id]);
 
-// Check if the form was submitted
-if (isset($_POST['submit'])) {
-    $categories = $_POST['category'];
-    $datasetId = $_POST['dataset_id'];
+        // สร้างคำสั่ง SQL สำหรับอัพเดท
+        $sql = "UPDATE class SET category = '$category' WHERE id_class = $category_id";
 
-    // Loop through the submitted categories and update the data
-    for ($i = 0; $i < count($categories); $i++) {
-        $category = mysqli_real_escape_string($conn, $categories[$i]);
-        $categoryId = $i + 1; // Adjust this based on your data
-
-        $sql = "UPDATE class SET category = '$category' WHERE id_class = $categoryId AND dataset_id = $datasetId";
-
-        if (mysqli_query($conn, $sql)) {
-            // Update successful
-        } else {
-            echo "Error updating data: " . mysqli_error($conn);
+        if (!mysqli_query($conn, $sql)) {
+            $success = false;
+            break;
         }
     }
 
-    // Redirect to the class.php page after updating
-    header("Location: class.php");
-    exit(); // Make sure to exit to prevent further script execution
+    if ($success) {
+        echo json_encode(["success" => true, "return" =>  $return]);
+       
+    } else {
+        echo json_encode(["success" => false, "return" =>  $return]);
+    }
+} else {
+    echo json_encode(["success" => false, "return" =>  $return]);
 }
 
-// Close the database connection if not already done
+// ปิดการเชื่อมต่อกับฐานข้อมูล
 mysqli_close($conn);
 ?>

@@ -1,14 +1,14 @@
 <?php
 session_start();
 include('server.php');
-include('navbar.php'); 
+include('admin_navbar.php'); 
 
 
 
 mysqli_set_charset($conn, "utf8");
 
 $id = $_GET["id"];
-$sql = "SELECT dataset.id AS dataset_id,status, dataset.dataname, dataset.description, COUNT(class.id_class) AS class_count, dataset.    implementdate 
+$sql = "SELECT dataset.id AS dataset_id,status, dataset.dataname, dataset.description, COUNT(class.id_class) AS class_count, dataset.           implementdate 
         FROM dataset LEFT JOIN class ON dataset.id = class.dataset_id
         WHERE dataset.id = $id GROUP BY dataset.id, dataset.dataname, dataset.description";
 $result = mysqli_query($conn, $sql);
@@ -124,7 +124,7 @@ if ($result) {
                         </tbody>
                     </table>
 
-                    <a href="class.php" class="btn btn-primary">👈🏼 กลับ</a>
+                    <a href="index.php" class="btn btn-primary">👈🏼 กลับ</a>
             </div>
             </thead>
 
