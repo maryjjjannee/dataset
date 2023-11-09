@@ -60,11 +60,10 @@ if ($result) {
             crossorigin="anonymous"></script>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
             integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
-
-        <title>Add image</title>
     </head>
 
     <body>
+        
         <?php include('user_navbar.php'); ?>
         <div class="container">
             <h1 class="text-center mt-5"></h1>
@@ -73,7 +72,9 @@ if ($result) {
                 <input type="hidden" name="class" value="<?php echo $class; ?>">
 
                 <table class="table table-striped">
+                <h1 class="text-center mt-3">Add class & Images</h1>
                     <div class="form-group col-6">
+                    
                         <table class="table table-striped table-bordered">
                             <thead>
                                 <tr>
@@ -94,11 +95,13 @@ if ($result) {
                             <tr>
                                 <td>
                                     <table class="table mb-0">
+                                        
                                         <thead>
                                             <tr>
                                                 <th>คลาส</th>
                                                 <th>หมวดหมู่</th>
-                                                <th>เพิ่มรูปภาพ</th>
+                                                <th>คำอธิบาย</th>
+                                                <th>อัพโหลดรูปภาพ dataset</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -108,6 +111,7 @@ if ($result) {
                                                 echo '<tr>';
                                                 echo '<td>' . $i . '</td>';
                                                 echo '<td><input class="form-control" type="text" name="category[' . $i . ']" ></td>';
+                                                echo '<td><input class="form-control" type="text" name="classdesc[' . $i . ']" ></td>';
                                                 echo '<td><input class="form-control"  type="file" name="image[' . $i . '][]" accept=".jpg, .jpeg, .png, .gif" multiple></td>';
                                                 echo '</tr>';
                                             }
@@ -115,7 +119,7 @@ if ($result) {
                                         </tbody>
                                     </table>
                                     <div class="my-3">
-                                    <a href="user.php" class="btn btn-primary">👈🏼 กลับ</a>
+                                    <a href="class.php" class="btn btn-primary">👈🏼 กลับ</a>
                                         <button type="submit" name="submit" class="btn btn-success">📂
                                             บันทึกข้อมูล</button>
                                         <input type="reset" value="🗑️ ลบข้อมูล" class="btn btn-danger">

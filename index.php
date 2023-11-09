@@ -29,7 +29,7 @@ include('server.php');
     <?php include('admin_navbar.php'); ?>
 
     <div class="homecontent">
-        <h2 class="text-center">ระบบจัดเก็บชุดข้อมูล</h2>
+        <h2 class="text-center">All dataset</h2>
 
         <?php if (isset($_SESSION['success'])) { ?>
             <div class="success">
@@ -41,14 +41,15 @@ include('server.php');
                 </h3>
             </div>
         <?php } ?>
+        <br>
 
         <div class="container">
-            <a href="admin_dataform.php"><button type="button" class="btn btn-primary">✍️ สร้างคลาส</button></a>
+           
 
             <div class="row mt-2">
                 <?php
                 // Query to fetch all datasets
-                $sql = "SELECT d.imagedataset, d.id, d.dataname, d.class, d.description, d.status, d.implementdate, u.username
+                $sql = "SELECT d.imagedataset, d.id, d.dataname, d.class, d.description, d.status, d.implementdate, u.username, d.statuspost, d.PDPA
             FROM dataset d
             INNER JOIN users u ON d.id_users = u.id_users
             WHERE d.class IS NOT NULL";
@@ -82,19 +83,30 @@ include('server.php');
                                             echo $row["status"];
                                         }
                                         ?>
+                                        <br> <strong>สถานะโพสต์ :</strong>
+                                        <?php
+                                        if ($row["statuspost"] === "รออนุมัติ") {
+                                            echo '🟡 รออนุมัติ';
+                                        } elseif ($row["statuspost"] === "อนุมัติ") {
+                                            echo '🟢 อนุมัติ';
+                                        } elseif ($row["statuspost"] === "ไม่อนุมัติ") {
+                                            echo '🔴 ไม่อนุมัติ';
+                                        } else {
+                                            echo $row["statuspost"];
+                                        }
+                                        ?>
                                         <br> <strong>สร้างเมื่อ :</strong>
                                         <?= $row["implementdate"]; ?>
                                         <br> <strong>username : </strong>
                                         <?= $row["username"]; ?>
+                                        <br> <strong>ยินยอมเผยแพร่ข้อมูล : </strong>
+                                        <?= $row["PDPA"]; ?>
                                     </p>
 
-                                    <div class="d-flex gap-2">
-                                        <a href="admin_viewdata.php?id=<?php echo $row["id"]; ?>" class="w-25"><button
-                                                type="button" class="btn btn-secondary w-100"><i
-                                                    class="bi bi-search"></i></button></a>
-                                        <a href="admin_delete.php?id=<?php echo $row["id"]; ?>" class="w-25"><button type="button"
-                                                class="btn btn-danger w-100" onclick="return confirm('ยืนยันการลบข้อมูล')"><i
-                                                    class="bi bi-trash3-fill"></i></button></a>
+                                    <div>
+                                        <a href="admin_viewdata.php?id=<?php echo $row["id"]; ?>" class="w-25">
+                                            <button type="button" class="btn btn-secondary w-100"><i
+                                                    class="bi bi-search "></i>ดูรายละเอียด</button></a>
                                     </div>
                                 </div>
                             </div>

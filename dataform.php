@@ -68,20 +68,20 @@ include('server.php');
         <div class="d-flex">
             <div class="row">
                 <div class="form-check ms-3">
-                    <input class="form-check-input" type="radio" name="typeImg" id="typeImg1" value="1">
-                    <label class="form-check-label" for="typeImg1">
+                    <input class="form-check-input" type="radio" name="imagetype" id="imagetype1" value="1">
+                    <label class="form-check-label" for="imagetype1">
                         ภาพขาว-ดำ (ฺBinary)
                     </label>
                 </div>
                 <div class="form-check ms-3">
-                    <input class="form-check-input" type="radio" name="typeImg" id="typeImg2" value="2">
-                    <label class="form-check-label" for="typeImg2">
+                    <input class="form-check-input" type="radio" name="imagetype" id="imagetype2" value="2">
+                    <label class="form-check-label" for="imagetype2">
                         ภาพเทา (GrayScale)
                     </label>
                 </div>
                 <div class="form-check ms-3">
-                    <input class="form-check-input" type="radio" name="typeImg" id="typeImg3" value="3">
-                    <label class="form-check-label" for="typeImg3">
+                    <input class="form-check-input" type="radio" name="imagetype" id="imagetype3" value="3">
+                    <label class="form-check-label" for="imagetype3">
                         ภาพสี (RGB)
                     </label>
                 </div>
@@ -145,8 +145,7 @@ include('server.php');
             <button type="reset" name="cancel" class="btn btn-danger">🗑️ ยกเลิก</button>
         </div>
     
-    <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"aria-hidden="true">
 
         <div class="modal-dialog modal-lg" role="document" for="status">
             <div class="modal-content">

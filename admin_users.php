@@ -35,7 +35,7 @@ $order = 1; //ให้เริ่มนับแถวจากเลข 1
 <body>
     <?php include('admin_navbar.php'); ?>
     <div class="container">
-        <h2 class="text-center mt-3">รายชื่อผู้ใช้งานทั้งหมด</h2>
+        <h2 class="text-center mt-3">All users</h2>
 
         <div class="form-group my-3">
             <form action="search.php" method="POST">
@@ -44,7 +44,7 @@ $order = 1; //ให้เริ่มนับแถวจากเลข 1
                         <input type="text" placeholder="กรอกชื่อ username ที่ต้องการค้นหา" class="form-control" name="search_users" required>
                     </div>
                     <div class="col-6">
-                        <input type="submit" value="ค้นหาข้อมูล" class="btn btn-info">
+                        <input type="submit" value="search" class="btn btn-info">
                     </div>
                 </div>
             </form>
@@ -81,7 +81,9 @@ $order = 1; //ให้เริ่มนับแถวจากเลข 1
 
               
             </tbody>
+            
         </table>
+       
     </div>
 </body>
 

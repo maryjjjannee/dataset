@@ -7,10 +7,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dataset_id = $_POST['dataset_id'];
     $user = $_SESSION['username'];
     $category = mysqli_real_escape_string($conn, $_POST['category']); // Ensure to sanitize user input
+    $classdesc = mysqli_real_escape_string($conn, $_POST['classdesc']);
 
     if ($conn) {
         // Insert the category
-        $insertCategorySql = "INSERT INTO class (category, dataset_id, username) VALUES ('$category', '$dataset_id', '$user')";
+        $insertCategorySql = "INSERT INTO class (category, dataset_id, username, classdesc) VALUES ('$category', '$dataset_id', '$user','$classdesc')";
         $result = mysqli_query($conn, $insertCategorySql);
 
         if ($result) {

@@ -10,13 +10,16 @@ if (isset($_POST['submit'])) {
     $dataset_id = $_POST['dataset_id'];
     $user = $_SESSION['username'];
     $class = $_POST['class'];
+    $classdesc = $_POST['classdesc'];
 
     if ($conn) {
         for ($i = 1; $i <= $class; $i++) {
-            $category = $_POST['category'][$i]; // Correctly access the category for the current class
+            $category = $_POST['category'][$i]; 
+            $classdesc = $_POST['classdesc'][$i]; 
+            // Correctly access the category for the current class
 
             // Insert the class/category
-            $sql = "INSERT INTO class (category, dataset_id, username) VALUES ('$category', '$dataset_id', '$user')";
+            $sql = "INSERT INTO class (category, dataset_id, username, classdesc) VALUES ('$category', '$dataset_id', '$user', '$classdesc')";
             $result = mysqli_query($conn, $sql);
 
             if ($result) {
@@ -53,7 +56,7 @@ if (isset($_POST['submit'])) {
         // Redirect after processing all classes
         echo "<script>
             alert('Image and category data have been successfully saved.');
-            window.location.href = 'user.php'; 
+            window.location.href = 'class.php'; 
         </script>";
     } else {
         echo "Error connecting to the database.<br>";

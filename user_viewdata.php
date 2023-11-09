@@ -1,14 +1,12 @@
 <?php
 session_start();
 include('server.php');
-include('user_navbar.php'); 
-
-
+include('user_navbar.php');
 
 mysqli_set_charset($conn, "utf8");
 
 $id = $_GET["id"];
-$sql = "SELECT dataset.id AS dataset_id,status, dataset.dataname, dataset.description, COUNT(class.id_class) AS class_count, dataset.           implementdate 
+$sql = "SELECT dataset.id AS dataset_id,status, dataset.dataname, dataset.description, COUNT(class.id_class) AS class_count, dataset.implementdate, dataset.imagetype, dataset.IRBstatus, dataset.IRBtype, dataset.PDPA ,dataset.statuspost, dataset.views
         FROM dataset LEFT JOIN class ON dataset.id = class.dataset_id
         WHERE dataset.id = $id GROUP BY dataset.id, dataset.dataname, dataset.description";
 $result = mysqli_query($conn, $sql);
@@ -21,16 +19,28 @@ if ($result) {
         $description = $row["description"];
         $class = $row["class_count"];
         $status = $row["status"];
+        $statuspost = $row["statuspost"];
         $implementdate = $row["implementdate"];
+        $imagetype = $row["imagetype"];
+        $IRBstatus = $row["IRBstatus"];
+        $IRBtype = $row["IRBtype"];
+        $views = $row["views"];
 
         // Fetch class-specific data grouped by category
-        $classSql = "SELECT class.category, COUNT(images.id_image) AS imageCount
+        $classSql = "SELECT class.id_class, class.category, COUNT(images.id_image) AS imageCount, class.classdesc
                      FROM class
                      INNER JOIN images ON class.id_class = images.imageRef
                      WHERE class.dataset_id = $id
                      GROUP BY class.category;
     ";
         $classResult = mysqli_query($conn, $classSql);
+
+        $updateViewCountSql = "UPDATE dataset SET views = views + 1 WHERE id = $id";
+        if (mysqli_query($conn, $updateViewCountSql)) {
+            // อัปเดตจำนวนการดูสำเร็จ
+        } else {
+            echo "ข้อผิดพลาดในการอัปเดตจำนวนการดู: " . mysqli_error($conn);
+        }
         if (!$classResult) {
             echo "เกิดข้อผิดพลาดในการดึงข้อมูลคลาส: " . mysqli_error($conn);
         }
@@ -40,6 +50,8 @@ if ($result) {
 } else {
     echo "เกิดข้อผิดพลาดในการดึงข้อมูลชุดข้อมูล: " . mysqli_error($conn);
 }
+mysqli_close($conn);
+
 ?>
 
 <!DOCTYPE html>
@@ -57,8 +69,12 @@ if ($result) {
 
 <body>
     <div class="container">
-        <h1 class="text-center mt-3">ชุดข้อมูล</h1>
+        <h1 class="text-center mt-3">Dataset detail</h1>
         <input type="hidden" value="<?php echo $id; ?>" name="id">
+        <div class="view-count">
+            จำนวนผู้เข้าชม:
+            <?php echo $row['views']; ?>
+        </div>
 
         <table class="table table-striped">
             <div class="form-group col-6">
@@ -89,9 +105,33 @@ if ($result) {
                             </td>
                         </tr>
                         <tr>
+                            <th>สถานะโพสต์ :</th>
+                            <td>
+                                <?php echo $statuspost; ?>
+                            </td>
+                        </tr>
+                        <tr>
                             <th>วันที่ :</th>
                             <td>
                                 <?php echo $implementdate; ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>ประเภทรูป :</th>
+                            <td>
+                                <?php echo $imagetype; ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>สถานะการขอจริยธรรม :</th>
+                            <td>
+                                <?php echo $IRBstatus; ?>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>ประเภทจริยธรรม :</th>
+                            <td>
+                                <?php echo $IRBtype; ?>
                             </td>
                         </tr>
                     </thead>
@@ -101,7 +141,11 @@ if ($result) {
                             <tr>
                                 <th>คลาส</th>
                                 <th>หมวดหมู่</th>
+                                <th>คำอธิบาย</th>
                                 <th>จำนวนรูปภาพ</th>
+                                <th>ดูรายละเอียด</th>
+
+
                             </tr>
                         </thead>
                         <tbody>
@@ -109,22 +153,38 @@ if ($result) {
                             $i = 1; // Initialize class number
                             while ($classRow = mysqli_fetch_assoc($classResult)) {
                                 $category = $classRow["category"];
-                                // $images = $classRow["images"];
+                                $id_class = $classRow["id_class"];
+                                $classdesc = $classRow["classdesc"];
                                 $imageCount = $classRow["imageCount"];
+                                ?>
 
-                                echo '<tr>';
-                                echo '<td>' . $i . '</td>';
-                                echo '<td>' . $category . '</td>';
-                                echo '<td>' . $imageCount . ' ไฟล์</td>';
-                                
-                                echo '</tr>';
+                                <tr>
+                                    <td>
+                                        <?php echo $i; ?>
+                                    </td>
+                                    <td>
+                                        <?php echo $category; ?>
+                                    </td>
+                                    <td>
+                                        <?php echo $classdesc; ?>
+                                    </td>
+                                    <td>
+                                        <?php echo $imageCount; ?> ไฟล์
+                                    </td>
+                                    <td><a href="user_viewdetail.php?id_class=<?php echo $id_class; ?>"
+                                            class="btn btn-secondary">ดูรายละเอียด</a></td>
+                                </tr>
+
+                                <?php
                                 $i++; // Increment class number
                             }
                             ?>
                         </tbody>
                     </table>
 
-                    <a href="user.php" class="btn btn-primary">👈🏼 กลับ</a>
+                    <button type="button" class="btn btn-primary" onclick="history.back()"> 👈🏼 กลับ </button>
+                    <a href="download.php?id=<?php echo $id; ?>" class="btn btn-success">ดาวน์โหลดชุดข้อมูล</a>
+
             </div>
             </thead>
 

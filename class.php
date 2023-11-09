@@ -14,6 +14,7 @@ if (isset($_SESSION['role'])) {
     $userRole = 0; // Default role for users without a role
 }
 
+
 ?>
 
 
@@ -34,12 +35,12 @@ if (isset($_SESSION['role'])) {
 
 <body>
 
-<?php include('user_navbar.php'); ?>
+    <?php include('user_navbar.php'); ?>
 
-<div class="homecontent">
-    <h2 class="text-center">ระบบจัดเก็บชุดข้อมูล</h2>
-    <!-- notification message-->
-    <?php if (isset($_SESSION['success'])) { ?>
+    <div class="homecontent">
+        <h2 class="text-center">Dataset</h2>
+        <!-- notification message-->
+        <?php if (isset($_SESSION['success'])) { ?>
             <div class="success">
                 <h3>
                     <?php
@@ -50,7 +51,7 @@ if (isset($_SESSION['role'])) {
             </div>
         <?php } ?>
 
-    <div class="container">
+        <div class="container">
             <!-- Check the user's role and display content accordingly -->
             <?php if ($userRole == 1) { // Admin Role ?>
                 <a href="dataform.php"><button type="button" class="btn btn-primary">✍️ สร้างคลาส</button></a>
@@ -58,24 +59,24 @@ if (isset($_SESSION['role'])) {
                 <!-- Additional user-specific content can be added here -->
             <?php } ?>
 
-            <a href="dataform.php" class="btn" >
-        <button type="button" class="btn btn-dark">➕ New dataset</button>
-        </a>
-                
-        <div class="row mt-2">
-            
-            <?php
+            <a href="dataform.php" class="btn">
+                <button type="button" class="btn btn-dark">➕ New dataset</button>
+            </a>
 
-           if ($userRole == 2) { // User Role
-               $userId = $_SESSION['id']; // Assuming you have the user's ID in the session
-               $sql = "SELECT imagedataset, id, dataname, class, description, status, implementdate FROM dataset WHERE class IS NOT NULL AND id_users = $userId;";
-               $result = mysqli_query($conn, $sql);
-               if (!$result) {
-                   die("Query failed: " . mysqli_error($conn));
-               }
-            }
+            <div class="row mt-2">
 
-            while ($row = mysqli_fetch_assoc($result)) { ?>
+                <?php
+
+                if ($userRole == 2) { // User Role
+                    $userId = $_SESSION['id']; // Assuming you have the user's ID in the session
+                    $sql = "SELECT imagedataset, id, dataname, class, description, status, implementdate,statuspost FROM dataset WHERE class IS NOT NULL AND id_users = $userId;";
+                    $result = mysqli_query($conn, $sql);
+                    if (!$result) {
+                        die("Query failed: " . mysqli_error($conn));
+                    }
+                }
+
+                while ($row = mysqli_fetch_assoc($result)) { ?>
                     <div class="col-md-3 mb-3">
                         <div class="card ">
                             <div class="divImgCover">
@@ -99,20 +100,37 @@ if (isset($_SESSION['role'])) {
                                         echo $row["status"];
                                     }
                                     ?>
+                                    <br> <strong>สถานะโพสต์ :</strong>
+                                    <?php
+                                    if ($row["statuspost"] === "รออนุมัติ") {
+                                        echo '🟡 รออนุมัติ';
+                                    } elseif ($row["statuspost"] === "อนุมัติ") {
+                                        echo '🟢 อนุมัติ';
+                                    } elseif ($row["statuspost"] === "ไม่อนุมัติ") {
+                                        echo '🔴 ไม่อนุมัติ';
+                                    } else {
+                                        echo $row["statuspost"];
+                                    }
+                                    ?>
+
                                     <br> <strong>สร้างเมื่อ :</strong>
                                     <?= $row["implementdate"]; ?>
+
+
                                 </p>
 
                                 <div class="d-flex gap-2">
-                                    <a href="user_viewdata.php?id=<?php echo $row["id"]; ?>" class="w-25"><button type="button"
-                                            class="btn btn-secondary w-100"><i class="bi bi-search"></i></button></a>
+                                    <a href="user_viewdata.php?id=<?php echo $row["id"]; ?>" class="w-25"><button
+                                            type="button" class="btn btn-secondary w-100"><i
+                                                class="bi bi-search"></i></button></a>
                                     <a href="addpic.php?id=<?php echo $row["id"]; ?>" class="w-25"><button type="button"
                                             class="btn btn-primary w-100" class="w-25"><i
                                                 class="bi bi-plus-square"></i></button></a>
                                     <a href="editform.php?id=<?php echo $row["id"]; ?>" class="w-25"><button type="button"
                                             class="btn btn-warning w-100"><i class="bi bi-pencil-square"></i></button></a>
-                                    <a href="user_delete.php?id=<?php echo $row["id"]; ?>" class="w-25"><button type="button"
-                                            class="btn btn-danger w-100" onclick="return confirm('ยืนยันการลบข้อมูล')"><i
+                                    <a href="user_delete.php?id=<?php echo $row["id"]; ?>" class="w-25"><button
+                                            type="button" class="btn btn-danger w-100"
+                                            onclick="return confirm('ยืนยันการลบข้อมูล')"><i
                                                 class="bi bi-trash3-fill"></i></button></a>
                                 </div>
 

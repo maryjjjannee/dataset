@@ -34,7 +34,7 @@ if ($result) {
         $status = $row["status"];
 
         // Fetch class-specific data grouped by category
-        $classSql = "SELECT id_class,class.category, COUNT(images.id_image) AS imageCount
+        $classSql = "SELECT id_class,class.category, COUNT(images.id_image) AS imageCount, class.classdesc
                     FROM class
                     INNER JOIN images ON class.id_class = images.imageRef
                     WHERE class.dataset_id = $id
@@ -95,39 +95,44 @@ if ($result) {
         <form action="updateform.php" method="POST" enctype="multipart/form-data" id="classForm">
     <h3 class="text-left">ข้อมูลคลาสทั้งหมด 
         <button type="button" class="btn btn-warning" data-bs-toggle="modal"data-bs-target="#formInsertClass">➕คลาส</button></h3>
-    <table class="table table-success table-striped mt-3" style="border:white;" id="addClass">
-        <thead>
-            <tr>
-                <th>คลาส</th>
-                <th>หมวดหมู่</th>
-                <th>จำนวนไฟล์รูปภาพ</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-                $i = 1; // Initialize class number
-                while ($classRow = mysqli_fetch_assoc($classResult)) {
-                    $categoryId = $classRow["id_class"];
-                    $category = $classRow["category"];
-                    $imageCount = $classRow["imageCount"];
-            
-            ?>
-            <tr>
-                <td><?php echo $i; ?></td>
-                <td>
-                    <input class="form-control" type="text" name="category[<?php echo $categoryId; ?>]" value="<?php echo $category; ?>">
-                    <input type="hidden" name="category_id[]" value="<?php echo $categoryId; ?>">
-                    <input type="hidden" name="dataset_id" value="<?php echo $id; ?>">
-                </td>
-                <td><?php echo $imageCount; ?> files</td>
-            </tr>
-            <?php
-                $i++;
-            }
-            ?>
-        </tbody>
+        <table class="table table-success table-striped mt-3" style="border:white;" id="addClass">
+    <thead>
+        <tr>
+            <th>คลาส</th>
+            <th>หมวดหมู่</th>
+            <th>คำอธิบาย</th>
+            <th>จำนวนไฟล์รูปภาพ</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+            $i = 1; // Initialize class number
+            while ($classRow = mysqli_fetch_assoc($classResult)) {
+                $categoryId = $classRow["id_class"];
+                $category = $classRow["category"];
+                $classdescId = $classRow["id_class"];
+                $classdesc = $classRow["classdesc"]; // ตรวจสอบว่าคอลัมน์ "classdesc" ถูกต้อง
+                $imageCount = $classRow["imageCount"];
+        ?>
+        <tr>
+            <td><?php echo $i; ?></td>
+            <td>
+                <input class="form-control" type="text" name="category[<?php echo $categoryId; ?>]" value="<?php echo $category; ?>">
+                <input type="hidden" name="category_id[]" value="<?php echo $categoryId; ?>">
+            </td>
+            <td>
+                <input class="form-control" type="text" name="classdesc[<?php echo $classdescId; ?>]" value="<?php echo $classdesc; ?>">
+                <input type="hidden" name="classdesc_id[]" value="<?php echo $classdescId; ?>">
+            </td>
+            <td><?php echo $imageCount; ?> files</td>
+        </tr>
+        <?php
+            $i++;
+        }
+        ?>
+    </tbody>
+</table>
 
-    </table>
     <div class="my-3 float-end">
         <a href="class.php" class="btn btn-primary">👈🏼 กลับ</a>
         <input type="submit" name="submit" id="updateButton" value="📂 บันทึกข้อมูล" class="btn btn-success">
@@ -146,12 +151,17 @@ if ($result) {
                 <h1 class="modal-title fs-5" id="exampleModalLabel">📌 Add Class</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            
             <div class="modal-body">
                 <form id="addClassForm" method="POST" action="insertModal.php" enctype="multipart/form-data">
                     <div class="form-floating mb-3">
                         <!-- Input for class name -->
                         <input type="text" name="category" class="form-control" id="category" placeholder="Please enter category" required>
                         <label for="floatingInput">Class</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" name="classdesc" class="form-control" id="classdesc" placeholder="Please enter description" required>
+                        <label for="floatingInput">Description</label>
                     </div>
                     <div class="mb-3">
                         <!-- Input for multiple images -->

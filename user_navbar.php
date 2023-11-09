@@ -18,7 +18,7 @@
             </ul>
             <searchform class="d-flex" role="search">
                 <b class="me-2 mt-1"><?php echo $_SESSION['username']; ?></b>
-                <img src="https://www.pngkit.com/png/full/115-1150342_user-avatar-icon-iconos-de-mujeres-a-color.png"
+                <img src="https://th.bing.com/th/id/OIP.loKKNQfqb7LzxjKU7CRyiAHaHa?pid=ImgDet&rs=1"
                     width="35px" height="35" style="border-radius:50%">
             </searchform>
             <?php if (isset($_SESSION['username'])){ ?>

@@ -11,11 +11,12 @@
                 <li class="nav-item">
                     <a class="nav-link" href="admin_users.php" style="color:white;">Users</a>
                 </li>
+                <a class="nav-link" href="report.php" style="color:white;">Report</a>
                 <a class="nav-link" href="admin_about.php" style="color:white;">About us</a>
             </ul>
             <searchform class="d-flex" role="search">
                 <b class="me-2 mt-1"><?php echo $_SESSION['username']; ?></b>
-                <img src="https://www.pngkit.com/png/full/115-1150342_user-avatar-icon-iconos-de-mujeres-a-color.png"
+                <img src="https://cdn1.iconfinder.com/data/icons/shopping-e-commerce-10/33/support_3-512.png"
                     width="35px" height="35" style="border-radius:50%">
             </searchform>
             <?php if (isset($_SESSION['username'])){ ?>
